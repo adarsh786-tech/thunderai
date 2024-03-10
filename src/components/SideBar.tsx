@@ -31,7 +31,7 @@ const SideBar = () => {
 
   const onNavigate = (url: string, pro: boolean) => {
     // if (pro !== true) router.push(url);
-    return pro !== true ? router.push(url) : null;
+    router.push(url);
   };
 
   return (

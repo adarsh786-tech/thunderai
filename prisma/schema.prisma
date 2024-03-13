@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -15,29 +15,42 @@ datasource db {
 }
 
 model Category {
-  id    String    @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  companions    Companion[]
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  companions Companion[]
 }
 
 model Companion {
-  id    String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId  String
-  userName  String
-  srcImage  String
-  name  String @db.String
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String
+  userName     String
+  srcImage     String
+  name         String 
   description  String
-  instructions  String @db.String
-  seed          String @db.String
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  category      Category @relation(fields: [categoryId], references: [id])
-  categoryId    String @db.ObjectId
+  instructions String 
+  seed         String 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String   @db.ObjectId
+  messages Message[]
 
   @@fulltext([name])
+}
 
-  
+enum Role {
+  user
+  system
+}
+
+model Message {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  role        Role
+  content     String   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  companionId String   @db.ObjectId
+  userId      String
+  companion Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
 
 }

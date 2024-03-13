@@ -16,6 +16,10 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
 import ImageUpload from "@/components/ImageUpload";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+
 import {
   Select,
   SelectContent,
@@ -75,6 +79,9 @@ const formSchema = z.object({
 });
 
 const CompanionForm = ({ initialData, categories }: CompanionFormProps) => {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -89,6 +96,25 @@ const CompanionForm = ({ initialData, categories }: CompanionFormProps) => {
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    try {
+      if (initialData) {
+        await axios.patch(`/api/companion/${initialData.id}`, values);
+      } else {
+        // Create companion
+        await axios.post("/api/companion", values);
+      }
+      toast({
+        description: "Success",
+      });
+      router.refresh();
+      router.push("/");
+    } catch (error) {
+      console.log(`Something Went Wrong!!. Error: ${error}`);
+      toast({
+        variant: "destructive",
+        description: "Something Went Wrong!!",
+      });
+    }
   };
 
   return (
@@ -131,7 +157,7 @@ const CompanionForm = ({ initialData, categories }: CompanionFormProps) => {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-slate-900"
+                      className="bg-slate-900 "
                       disabled={isLoading}
                       placeholder="Elon Musk"
                       {...field}
